@@ -237,13 +237,13 @@ export default function VideoPage({ id }) {
         .actions { margin-left:auto; display:flex; gap:10px; }
         .btn { height:36px; padding:0 14px; border:1px solid #e5e7eb; background:#fff; border-radius:999px; font-weight:700; cursor:pointer; }
         .btn.primary { background:#111827; color:#fff; border-color:#111827; }
-        .saveControls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; position:relative; }
+        .saveControls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:0; position:relative; }
         .select { height:32px; border:1px solid #d1d5db; border-radius:10px; padding:0 8px; }
         .smallInput { height:32px; border:1px solid #d1d5db; border-radius:10px; padding:0 8px; }
         .saveBox {
           position:absolute;
           top:44px;
-          left:0;
+          right:0;
           z-index:5;
           background:#fff;
           border:1px solid #e5e7eb;
