@@ -144,28 +144,6 @@ export default function ProfileSettings() {
             </div>
           </div>
 
-          <div className="field" style={{marginTop:12}}>
-            <label className="label">Choose an avatar</label>
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(80px, 1fr))", gap:10 }}>
-              {AVATARS.map((url) => (
-                <button
-                  type="button"
-                  key={url}
-                  onClick={() => setAvatarUrl(url)}
-                  style={{
-                    border: avatarUrl === url ? "2px solid #111827" : "1px solid #d1d5db",
-                    borderRadius: 10,
-                    padding: 6,
-                    background: "#fff",
-                    cursor: "pointer",
-                  }}
-                >
-                  <div style={{ width:"100%", aspectRatio:"1/1", borderRadius:8, background:`url(${url}) center/cover no-repeat` }} />
-                </button>
-              ))}
-            </div>
-          </div>
-
           <div className="field" style={{ marginTop:12 }}>
             <label className="label" htmlFor="headerUrl">Header image URL</label>
             <input
