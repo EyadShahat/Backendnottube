@@ -2,19 +2,34 @@ import React from "react";
 import ShellLayout from "./ShellLayout.jsx";
 import { useNotTube } from "../state/NotTubeState.jsx";
 import { AVATARS } from "../data/avatars.js";
+import { apiRequest } from "../api/client.js";
 
 export default function ProfileSettings() {
-  const { user, updateProfile } = useNotTube();
+  const { user, updateProfile, changePassword, refreshVideos, videos } = useNotTube();
   const [displayName, setDisplayName] = React.useState(user?.name || "");
   const [avatarUrl, setAvatarUrl] = React.useState(user?.avatarUrl || "");
   const [bio, setBio] = React.useState(user?.bio || "");
   const [saving, setSaving] = React.useState(false);
   const [savedAt, setSavedAt] = React.useState(null);
+  const [subscriberCount, setSubscriberCount] = React.useState(null);
+  const [currentPassword, setCurrentPassword] = React.useState("");
+  const [newPassword, setNewPassword] = React.useState("");
+  const [pwStatus, setPwStatus] = React.useState("");
 
   React.useEffect(() => {
     setDisplayName(user?.name || "");
     setAvatarUrl(user?.avatarUrl || "");
     setBio(user?.bio || "");
+  }, [user?.name]);
+
+  React.useEffect(() => { refreshVideos().catch(() => {}); }, [refreshVideos]);
+
+  React.useEffect(() => {
+    const channel = user?.name;
+    if (!channel) return;
+    apiRequest(`/users/subscribers/count?channel=${encodeURIComponent(channel)}`)
+      .then((data) => setSubscriberCount(typeof data.count === "number" ? data.count : null))
+      .catch(() => setSubscriberCount(null));
   }, [user?.name]);
 
   async function handleSave(e) {
@@ -24,6 +39,22 @@ export default function ProfileSettings() {
     setSaving(false);
     setSavedAt(new Date());
   }
+
+  async function handlePassword(e) {
+    e.preventDefault();
+    if (!currentPassword || !newPassword) return;
+    setPwStatus("Saving...");
+    try {
+      await changePassword({ currentPassword, newPassword });
+      setPwStatus("Password updated");
+      setCurrentPassword("");
+      setNewPassword("");
+    } catch (err) {
+      setPwStatus(err?.message || "Error updating password");
+    }
+  }
+
+  const myVideoCount = videos.filter((v) => String(v.owner) === String(user?.id)).length;
 
   return (
     <ShellLayout active="profile">
@@ -47,7 +78,7 @@ export default function ProfileSettings() {
 
       <h2 style={{margin:"0 0 12px"}}>Profile settings</h2>
 
-      <form className="grid" onSubmit={handleSave}>
+      <div className="grid">
         {/* left column */}
         <section className="card">
           <div className="stack" style={{marginBottom:14}}>
@@ -55,6 +86,9 @@ export default function ProfileSettings() {
             <div>
               <div style={{fontWeight:700}}>Profile photo</div>
               <div className="muted">(Mock) Avatar preview only</div>
+              <div className="muted">
+                {subscriberCount === null ? "Subscribers: —" : `Subscribers: ${subscriberCount}`} • {myVideoCount} videos
+              </div>
             </div>
           </div>
 
@@ -101,12 +135,35 @@ export default function ProfileSettings() {
 
         {/* right column */}
         <aside className="card">
-          <div className="muted">Password changes are not wired in this demo.</div>
+          <div className="muted">Update password</div>
+          <div className="field" style={{ marginTop:10 }}>
+            <label className="label" htmlFor="currentPassword">Current password</label>
+            <input
+              id="currentPassword"
+              type="password"
+              className="input"
+              value={currentPassword}
+              onChange={(e)=>setCurrentPassword(e.target.value)}
+            />
+          </div>
+          <div className="field" style={{ marginTop:10 }}>
+            <label className="label" htmlFor="newPassword">New password</label>
+            <input
+              id="newPassword"
+              type="password"
+              className="input"
+              value={newPassword}
+              onChange={(e)=>setNewPassword(e.target.value)}
+            />
+          </div>
+          <button className="btn" style={{ marginTop:12, width:"100%" }} type="button" onClick={handlePassword}>
+            Change password
+          </button>
+          {pwStatus && <div className="muted" style={{ marginTop:8 }}>{pwStatus}</div>}
 
-          <div style={{height:12}} />
-
-          <button className="btn" type="submit" disabled={saving}>
-            {saving ? "Saving..." : "Save changes"}
+          <div style={{height:16}} />
+          <button className="btn" type="button" disabled={saving} onClick={handleSave}>
+            {saving ? "Saving..." : "Save profile"}
           </button>
           {savedAt && (
             <div className="muted" style={{marginTop:8}}>
@@ -114,7 +171,7 @@ export default function ProfileSettings() {
             </div>
           )}
         </aside>
-      </form>
+      </div>
     </ShellLayout>
   );
 }

@@ -180,6 +180,10 @@ export function NotTubeProvider({ children }) {
     await refreshVideos();
   }, [refreshVideos]);
 
+  const changePassword = React.useCallback(async ({ currentPassword, newPassword }) => {
+    return apiRequest("/auth/password", { method: "POST", body: { currentPassword, newPassword } });
+  }, []);
+
   const ensureDuration = React.useCallback((src) => {
     if (!src || durations[src]) return;
     const video = document.createElement("video");
@@ -232,6 +236,7 @@ export function NotTubeProvider({ children }) {
     updateVideo,
     deleteVideo,
     updateProfile,
+    changePassword,
     createFlag,
     loadFlags,
     loadMyFlags,

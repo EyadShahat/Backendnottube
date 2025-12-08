@@ -40,7 +40,11 @@ export default function SidebarSubs() {
             <div
               className="sb-ava"
               style={{
-                backgroundImage: (byName.get(name) || (user?.name === name ? user?.avatarUrl : "")) ? `url(${byName.get(name) || user?.avatarUrl})` : undefined,
+                backgroundImage: (() => {
+                  const selfAva = user?.name === name ? user?.avatarUrl : "";
+                  const src = selfAva || byName.get(name);
+                  return src ? `url(${src})` : undefined;
+                })(),
               }}
             />
             <div className="sb-name">{name}</div>

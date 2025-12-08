@@ -37,6 +37,11 @@ const subscriptionSchema = z.object({
   channel: z.string().min(1),
 });
 
+const passwordSchema = z.object({
+  currentPassword: z.string().min(6),
+  newPassword: z.string().min(6, "Password must be at least 6 characters"),
+});
+
 function makeToken(user) {
   return jwt.sign(
     { id: user._id, role: user.role },
@@ -144,6 +149,16 @@ router.post("/subscriptions/toggle", authRequired, asyncHandler(async (req, res)
   }
   await req.user.save();
   res.json({ subscribed: !exists, subscriptions: req.user.subscriptions });
+}));
+
+router.post("/password", authRequired, asyncHandler(async (req, res) => {
+  const { currentPassword, newPassword } = passwordSchema.parse(req.body);
+  const ok = await bcrypt.compare(currentPassword, req.user.passwordHash);
+  if (!ok) return res.status(400).json({ error: "Current password is incorrect" });
+
+  req.user.passwordHash = await bcrypt.hash(newPassword, 10);
+  await req.user.save();
+  res.json({ ok: true });
 }));
 
 export default router;

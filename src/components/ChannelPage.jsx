@@ -3,7 +3,7 @@ import ShellLayout from "./ShellLayout.jsx";
 import { useNotTube } from "../state/NotTubeState.jsx";
 
 export default function ChannelPage({ slug }) {
-  const { subs, toggleSubscribe, videos } = useNotTube();
+  const { subs, toggleSubscribe, videos, user } = useNotTube();
 
   const nameFromSlug = decodeURIComponent(slug).replace(/-/g, " ");
   const items = videos.filter(
@@ -26,7 +26,12 @@ export default function ChannelPage({ slug }) {
     const withAvatar = items.find((v) => v.avatarUrl);
     if (withAvatar?.avatarUrl) return withAvatar.avatarUrl;
     const withOwner = items.find((v) => v.owner?.avatarUrl);
-    return withOwner?.owner?.avatarUrl || "";
+    const ownerAva = withOwner?.owner?.avatarUrl || "";
+    if (user?.name && channelName && user.name === channelName && user.avatarUrl) {
+      // Prefer the viewer's latest avatar if this is their own channel.
+      return user.avatarUrl;
+    }
+    return ownerAva;
   })();
   const isSubd = subs.includes(channelName);
 
