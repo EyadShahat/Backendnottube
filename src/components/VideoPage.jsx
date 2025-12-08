@@ -161,6 +161,15 @@ export default function VideoPage({ id }) {
     setCategoryOpen(false);
   }
 
+  async function handleUnsave() {
+    if (!video || !isSaved) return;
+    await toggleSave(video.id);
+    const next = { ...assignments };
+    delete next[video.id];
+    persistCategories(next, categories);
+    setCategoryOpen(false);
+  }
+
   if (!video) {
     return (
       <ShellLayout>
@@ -242,16 +251,15 @@ export default function VideoPage({ id }) {
         .smallInput { height:32px; border:1px solid #d1d5db; border-radius:10px; padding:0 8px; }
         .saveBox {
           position:absolute;
-          top:44px;
-          right:0;
+          top:40px;
+          left:0;
           z-index:5;
           background:#fff;
           border:1px solid #e5e7eb;
           border-radius:12px;
           padding:10px;
           box-shadow:0 8px 20px rgba(0,0,0,0.08);
-          min-width:280px;
-          transform: translateX(50%);
+          min-width:220px;
         }
         .saveBoxActions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
 
@@ -340,7 +348,12 @@ export default function VideoPage({ id }) {
               </button>
               <div className="saveControls">
                 <div className="saveBox">
-                  <button className={`btn ${isSaved ? "primary" : ""}`} type="button" onClick={openSaveBox}>
+                  <button
+                    className={`btn ${isSaved ? "primary" : ""}`}
+                    type="button"
+                    onClick={openSaveBox}
+                    onDoubleClick={handleUnsave}
+                  >
                     {isSaved ? "Saved ✓" : "Save"}
                   </button>
                   {categoryOpen && (
