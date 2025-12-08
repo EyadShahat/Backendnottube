@@ -114,6 +114,7 @@ export default function ProfileSettings() {
             onDragOver={(e)=>{e.preventDefault(); setHeaderDrag(true);}}
             onDragLeave={()=>setHeaderDrag(false)}
             onDrop={onHeaderDrop}
+            style={{ marginTop:10, marginBottom:16 }}
           >
             Drag & drop a header image here or
             <label style={{ color:"#0ea5e9", cursor:"pointer", marginLeft:4 }}>
