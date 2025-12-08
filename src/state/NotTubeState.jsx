@@ -177,7 +177,8 @@ export function NotTubeProvider({ children }) {
   const updateProfile = React.useCallback(async (payload) => {
     const res = await apiRequest("/auth/profile", { method: "PUT", body: payload });
     setUser(res.user);
-  }, []);
+    await refreshVideos();
+  }, [refreshVideos]);
 
   const ensureDuration = React.useCallback((src) => {
     if (!src || durations[src]) return;

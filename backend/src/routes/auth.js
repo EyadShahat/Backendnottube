@@ -118,6 +118,21 @@ router.put("/profile", authRequired, asyncHandler(async (req, res) => {
   if (typeof body.avatarUrl !== "undefined") req.user.avatarUrl = body.avatarUrl;
   if (typeof body.bio !== "undefined") req.user.bio = body.bio;
   await req.user.save();
+
+   // keep avatars in sync on existing videos/comments for this user
+  await Promise.all([
+    // update videos owned by this user
+    (async () => {
+      try {
+        const Video = (await import("../models/Video.js")).default;
+        await Video.updateMany(
+          { owner: req.user._id },
+          { avatarUrl: req.user.avatarUrl || "" },
+        );
+      } catch { /* ignore */ }
+    })(),
+  ]);
+
   res.json({ user: publicUser(req.user) });
 }));
 
