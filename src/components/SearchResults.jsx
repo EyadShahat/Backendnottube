@@ -94,7 +94,12 @@ export default function SearchResults({ q = "" }) {
               </div>
               <div>
                 <div className="channelName">{v.channelName || v.channel || "Channel"}</div>
-                <div className="channelMeta">{v.owner?.bio || ""}</div>
+                <div className="channelMeta">
+                  {v.owner?.bio || ""}
+                </div>
+                <div className="channelMeta">
+                  {(v.owner?.subscriptions?.length || 0)} subscribers • {(v.channelVideoCount ?? 0)} videos
+                </div>
               </div>
             </a>
           ))}

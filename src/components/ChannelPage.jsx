@@ -56,7 +56,7 @@ export default function ChannelPage({ slug }) {
     <ShellLayout>
       <style>{`
         .banner { height:160px; border-radius:14px; background:#e5e7eb; background-size:cover; background-position:center; }
-        .head { display:flex; align-items:flex-end; gap:14px; margin-top:-28px; }
+        .head { display:flex; align-items:flex-end; gap:14px; margin-top:12px; }
         .avatar {
           width:84px; height:84px; border-radius:999px;
           background:#0f172a center/cover no-repeat;
