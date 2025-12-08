@@ -32,7 +32,7 @@ router.get("/", asyncHandler(async (req, res) => {
   const videos = await Video.find(query)
     .sort({ createdAt: -1 })
     .limit(100)
-    .populate("owner", "avatarUrl name")
+    .populate("owner", "avatarUrl name headerUrl")
     .lean();
 
   const normalized = videos.map((v) => ({
@@ -64,7 +64,7 @@ router.post("/", authRequired, asyncHandler(async (req, res) => {
 }));
 
 router.get("/:id", asyncHandler(async (req, res) => {
-  const video = await Video.findById(req.params.id).populate("owner", "avatarUrl name").lean();
+  const video = await Video.findById(req.params.id).populate("owner", "avatarUrl name headerUrl").lean();
   if (!video) return res.status(404).json({ error: "Video not found" });
   const merged = {
     ...video,

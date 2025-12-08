@@ -9,6 +9,7 @@ export default function ProfileSettings() {
   const [displayName, setDisplayName] = React.useState(user?.name || "");
   const [avatarUrl, setAvatarUrl] = React.useState(user?.avatarUrl || "");
   const [bio, setBio] = React.useState(user?.bio || "");
+  const [headerUrl, setHeaderUrl] = React.useState(user?.headerUrl || "");
   const [saving, setSaving] = React.useState(false);
   const [savedAt, setSavedAt] = React.useState(null);
   const [subscriberCount, setSubscriberCount] = React.useState(null);
@@ -20,7 +21,8 @@ export default function ProfileSettings() {
     setDisplayName(user?.name || "");
     setAvatarUrl(user?.avatarUrl || "");
     setBio(user?.bio || "");
-  }, [user?.name]);
+    setHeaderUrl(user?.headerUrl || "");
+  }, [user?.name, user?.headerUrl]);
 
   React.useEffect(() => { refreshVideos().catch(() => {}); }, [refreshVideos]);
 
@@ -35,7 +37,7 @@ export default function ProfileSettings() {
   async function handleSave(e) {
     e.preventDefault();
     setSaving(true);
-    await updateProfile({ name: displayName.trim() || user.name, avatarUrl: avatarUrl.trim(), bio });
+    await updateProfile({ name: displayName.trim() || user.name, avatarUrl: avatarUrl.trim(), headerUrl: headerUrl.trim(), bio });
     setSaving(false);
     setSavedAt(new Date());
   }
@@ -73,6 +75,7 @@ export default function ProfileSettings() {
         .row { display:grid; grid-template-columns: 1fr 1fr; gap:12px; }
         .avatar { width:88px; height:88px; border-radius:999px; background:#e5e7eb center/cover no-repeat; border:1px solid #e5e7eb; }
         .stack { display:flex; gap:12px; align-items:center; }
+        .headerPreview { width:100%; height:120px; border-radius:12px; background:#eef0f2 center/cover no-repeat; border:1px dashed #cbd5e1; margin-bottom:12px; }
         @media (max-width: 900px){ .grid{ grid-template-columns: 1fr; } }
       `}</style>
 
@@ -81,6 +84,7 @@ export default function ProfileSettings() {
       <div className="grid">
         {/* left column */}
         <section className="card">
+          <div className="headerPreview" style={headerUrl ? { backgroundImage:`url(${headerUrl})` } : undefined} />
           <div className="stack" style={{marginBottom:14}}>
             <div className="avatar" style={avatarUrl ? { backgroundImage: `url(${avatarUrl})` } : undefined} />
             <div>
@@ -124,6 +128,18 @@ export default function ProfileSettings() {
                 </button>
               ))}
             </div>
+          </div>
+
+          <div className="field" style={{ marginTop:12 }}>
+            <label className="label" htmlFor="headerUrl">Header image URL</label>
+            <input
+              id="headerUrl"
+              className="input"
+              value={headerUrl}
+              onChange={(e)=>setHeaderUrl(e.target.value)}
+              placeholder="https://example.com/header.jpg"
+            />
+            <div className="muted">Shown at the top of your channel page.</div>
           </div>
 
           <div className="field" style={{marginTop:12}}>

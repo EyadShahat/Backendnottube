@@ -28,17 +28,25 @@ export default function ChannelPage({ slug }) {
     const withOwner = items.find((v) => v.owner?.avatarUrl);
     const ownerAva = withOwner?.owner?.avatarUrl || "";
     if (user?.name && channelName && user.name === channelName && user.avatarUrl) {
-      // Prefer the viewer's latest avatar if this is their own channel.
       return user.avatarUrl;
     }
     return ownerAva;
+  })();
+
+  const channelHeader = (() => {
+    const withHeader = items.find((v) => v.owner?.headerUrl);
+    const ownerHeader = withHeader?.owner?.headerUrl || "";
+    if (user?.name && channelName && user.name === channelName && user.headerUrl) {
+      return user.headerUrl;
+    }
+    return ownerHeader;
   })();
   const isSubd = subs.includes(channelName);
 
   return (
     <ShellLayout>
       <style>{`
-        .banner { height:160px; border-radius:14px; background:#e5e7eb; }
+        .banner { height:160px; border-radius:14px; background:#e5e7eb; background-size:cover; background-position:center; }
         .head { display:flex; align-items:flex-end; gap:14px; margin-top:-28px; }
         .avatar {
           width:84px; height:84px; border-radius:999px;
@@ -56,7 +64,7 @@ export default function ChannelPage({ slug }) {
         .by { padding:0 10px 12px; color:#6b7280; font-size:12.5px; }
       `}</style>
 
-      <div className="banner" />
+      <div className="banner" style={channelHeader ? { backgroundImage:`url(${channelHeader})` } : undefined} />
       <div className="head">
         <div className="avatar" style={channelAvatar ? { backgroundImage:`url(${channelAvatar})` } : undefined} />
         <div>

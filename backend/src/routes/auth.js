@@ -30,6 +30,7 @@ const adminEmails = (process.env.ADMIN_EMAILS || "admin@nottube.com")
 const profileSchema = z.object({
   name: z.string().min(1).optional(),
   avatarUrl: avatarSchema,
+  headerUrl: avatarSchema,
   bio: z.string().optional(),
 });
 
@@ -56,6 +57,7 @@ function publicUser(user) {
     email: user.email,
     name: user.name,
     avatarUrl: user.avatarUrl || "",
+    headerUrl: user.headerUrl || "",
     role: user.role,
     accountStatus: user.accountStatus,
     bio: user.bio || "",
@@ -122,6 +124,7 @@ router.put("/profile", authRequired, asyncHandler(async (req, res) => {
   const body = profileSchema.parse(req.body);
   if (body.name) req.user.name = body.name;
   if (typeof body.avatarUrl !== "undefined") req.user.avatarUrl = body.avatarUrl;
+  if (typeof body.headerUrl !== "undefined") req.user.headerUrl = body.headerUrl;
   if (typeof body.bio !== "undefined") req.user.bio = body.bio;
   await req.user.save();
 
@@ -131,6 +134,7 @@ router.put("/profile", authRequired, asyncHandler(async (req, res) => {
        { owner: req.user._id },
        {
          avatarUrl: req.user.avatarUrl || "",
+         headerUrl: req.user.headerUrl || "",
          ...(body.name ? { channelName: req.user.name } : {}),
        },
      );
