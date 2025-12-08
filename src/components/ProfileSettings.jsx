@@ -1,7 +1,6 @@
 import React from "react";
 import ShellLayout from "./ShellLayout.jsx";
 import { useNotTube } from "../state/NotTubeState.jsx";
-import { AVATARS } from "../data/avatars.js";
 import { apiRequest } from "../api/client.js";
 
 export default function ProfileSettings() {

@@ -1,13 +1,13 @@
 import React from "react";
 import { useNotTube } from "../state/NotTubeState.jsx";
-import { AVATARS } from "../data/avatars.js";
 
 export default function NotTubeSignup() {
   const [email, setEmail] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [username, setUsername] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [avatarUrl, setAvatarUrl] = React.useState(AVATARS[0]);
+  const [avatarUrl, setAvatarUrl] = React.useState("");
+  const [avatarDrag, setAvatarDrag] = React.useState(false);
   const [showPw, setShowPw] = React.useState(false);
   const [error, setError] = React.useState("");
   const { signup } = useNotTube();
@@ -26,6 +26,20 @@ export default function NotTubeSignup() {
       setError(err.message || "Signup failed");
     }
   }
+
+  const handleFileToDataUrl = (file) => {
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setAvatarUrl(reader.result?.toString() || "");
+    reader.readAsDataURL(file);
+  };
+
+  const onAvatarDrop = (e) => {
+    e.preventDefault();
+    setAvatarDrag(false);
+    const file = e.dataTransfer.files?.[0];
+    handleFileToDataUrl(file);
+  };
 
   return (
     <div className="page">
@@ -89,6 +103,9 @@ export default function NotTubeSignup() {
           border:1px solid transparent; background:#0b0b0b; color:#fff;
         }
         .btn:disabled { background:#d1d5db; color:#fff; cursor:not-allowed; }
+        .drop { border:1px dashed #cbd5e1; border-radius:10px; padding:12px; text-align:center; color:#6b7280; background:#fafafa; }
+        .drop.drag { background:#e0f2fe; border-color:#38bdf8; color:#0ea5e9; }
+        .avatarPreview { width:72px; height:72px; border-radius:50%; background:#e5e7eb center/cover no-repeat; border:1px solid #e5e7eb; margin-top:8px; }
       `}</style>
 
       <header className="topbar">
@@ -135,25 +152,21 @@ export default function NotTubeSignup() {
               </div>
 
               <div>
-                <label className="label">Choose an avatar</label>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill, minmax(80px, 1fr))", gap:10 }}>
-                  {AVATARS.map((url) => (
-                    <button
-                      type="button"
-                      key={url}
-                      onClick={() => setAvatarUrl(url)}
-                      style={{
-                        border: avatarUrl === url ? "2px solid #111827" : "1px solid #d1d5db",
-                        borderRadius: 10,
-                        padding: 6,
-                        background: "#fff",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <div style={{ width:"100%", aspectRatio:"1/1", borderRadius:8, background:`url(${url}) center/cover no-repeat` }} />
-                    </button>
-                  ))}
+                <label className="label">Avatar</label>
+                <div
+                  className={`drop ${avatarDrag ? "drag" : ""}`}
+                  onDragOver={(e)=>{e.preventDefault(); setAvatarDrag(true);}}
+                  onDragLeave={()=>setAvatarDrag(false)}
+                  onDrop={onAvatarDrop}
+                >
+                  Drag & drop an image or{" "}
+                  <label style={{ color:"#0ea5e9", cursor:"pointer" }}>
+                    browse
+                    <input type="file" accept="image/*" style={{ display:"none" }} onChange={(e)=>handleFileToDataUrl(e.target.files?.[0])} />
+                  </label>
+                  <div style={{ fontSize:12, marginTop:6 }}>Optional; leave empty to use initials.</div>
                 </div>
+                <div className="avatarPreview" style={avatarUrl ? { backgroundImage:`url(${avatarUrl})` } : undefined} />
               </div>
 
               <div>
