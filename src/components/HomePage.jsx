@@ -68,7 +68,7 @@ export default function HomePage() {
           </button>
         </div>
         <a className="createBtn" href="#/upload" role="button">Create</a>
-        <div className="avatarBtn" title="Profile">E</div>
+        
       </div>
 
       {/* grid */}

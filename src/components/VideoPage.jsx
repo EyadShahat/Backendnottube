@@ -24,7 +24,14 @@ export default function VideoPage({ id }) {
   const [selectedAccount, setSelectedAccount] = React.useState(null);
   const [accountInfo, setAccountInfo] = React.useState(null);
   const [flaggedComments, setFlaggedComments] = React.useState(new Set());
+  const [subscriberCount, setSubscriberCount] = React.useState(null);
   const isAdmin = user?.role === "admin";
+
+  React.useEffect(() => {
+    // When the route id or videos list changes, sync the local video state.
+    const found = videos.find((v) => String(v.id) === String(id));
+    if (found) setVideo(found);
+  }, [id, videos]);
 
   React.useEffect(() => {
     if (!video) {
@@ -32,12 +39,25 @@ export default function VideoPage({ id }) {
         const found = list.find((v) => String(v.id) === String(id));
         if (found) setVideo(found);
       });
-    } else {
+      return;
+    }
+    if (video?.id) {
       markWatched(video.id);
       loadComments(video.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, video?.id]);
+  }, [id, video?.id, refreshVideos]);
+
+  React.useEffect(() => {
+    const channel = video?.channelName || video?.channel;
+    if (!channel) {
+      setSubscriberCount(null);
+      return;
+    }
+    apiRequest(`/users/subscribers/count?channel=${encodeURIComponent(channel)}`)
+      .then((res) => setSubscriberCount(res.count ?? null))
+      .catch(() => setSubscriberCount(null));
+  }, [video?.channelName, video?.channel]);
 
   async function loadComments(vid) {
     const res = await apiRequest(`/comments/video/${vid}`);
@@ -137,6 +157,7 @@ export default function VideoPage({ id }) {
         .fsBtn { position:absolute; right:10px; bottom:10px; height:36px; padding:0 12px; border-radius:10px; border:1px solid rgba(255,255,255,.3); background:rgba(17,24,39,.7); color:#fff; font-weight:700; cursor:pointer; }
 
         .vtitle { font-size:28px; font-weight:900; letter-spacing:-.01em; margin:10px 0; }
+        .vmeta { color:#6b7280; font-size:13px; margin-top:-6px; margin-bottom:6px; }
         .chRow { display:flex; align-items:center; gap:12px; }
         .ava { width:44px; height:44px; background:#0f172a center/cover no-repeat; border-radius:999px; }
         .chName { font-weight:800; }
@@ -184,7 +205,7 @@ export default function VideoPage({ id }) {
           <button className="searchBtn" type="button" aria-label="Search" onClick={goSearch}>Search</button>
         </div>
         <a className="createBtn" href="#/upload" role="button">Create</a>
-        <div className="avatarBtn" title="Profile">E</div>
+        
       </div>
 
       <div className="layout">
@@ -204,6 +225,7 @@ export default function VideoPage({ id }) {
           </div>
 
           <h1 className="vtitle">{video.title}</h1>
+          <div className="vmeta">{video.views || 0} views</div>
 
           <div className="chRow">
             <div className="ava" style={video.avatarUrl ? { backgroundImage:`url(${video.avatarUrl})` } : undefined} />
@@ -216,7 +238,7 @@ export default function VideoPage({ id }) {
                 {video.channelName || video.channel || "Channel"}
               </a>
               <div className="meta">
-                {video.views || 0} views
+                {subscriberCount === null ? "—" : `${subscriberCount} subscribers`}
               </div>
             </div>
 
