@@ -64,16 +64,21 @@ export default function VideoPage({ id }) {
       .catch(() => setSubscriberCount(null));
   }, [video?.channelName, video?.channel]);
 
+  const categoryKey = React.useMemo(() => user?.id ? `nt_saved_categories_${user.id}` : "nt_saved_categories_guest", [user?.id]);
+
   React.useEffect(() => {
     try {
-      const raw = localStorage.getItem("nt_saved_categories");
+      const raw = localStorage.getItem(categoryKey);
       if (raw) {
         const parsed = JSON.parse(raw);
         setAssignments(parsed.assignments || {});
         setCategories(["none", ...(parsed.categories || [])]);
+      } else {
+        setAssignments({});
+        setCategories(["none"]);
       }
     } catch { /* ignore */ }
-  }, []);
+  }, [categoryKey]);
 
   React.useEffect(() => {
     if (!video) return;
@@ -121,7 +126,7 @@ export default function VideoPage({ id }) {
     setAssignments(nextAssignments);
     setCategories(nextCategories);
     try {
-      localStorage.setItem("nt_saved_categories", JSON.stringify({
+      localStorage.setItem(categoryKey, JSON.stringify({
         assignments: nextAssignments,
         categories: nextCategories.filter((c) => c !== "none"),
       }));

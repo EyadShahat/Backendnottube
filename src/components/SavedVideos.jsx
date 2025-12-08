@@ -3,7 +3,7 @@ import ShellLayout from "./ShellLayout.jsx";
 import { useNotTube } from "../state/NotTubeState.jsx";
 
 export default function SavedVideos() {
-  const { savedIds, videos } = useNotTube();
+  const { savedIds, videos, user } = useNotTube();
   const items = videos.filter((v) => savedIds.includes(String(v.id)));
 
   const [category, setCategory] = React.useState("all");
@@ -11,9 +11,11 @@ export default function SavedVideos() {
   const [assignments, setAssignments] = React.useState({});
   const [categories, setCategories] = React.useState(["all"]);
 
+  const categoryKey = React.useMemo(() => user?.id ? `nt_saved_categories_${user.id}` : "nt_saved_categories_guest", [user?.id]);
+
   React.useEffect(() => {
     try {
-      const raw = localStorage.getItem("nt_saved_categories");
+      const raw = localStorage.getItem(categoryKey);
       if (raw) {
         const parsed = JSON.parse(raw);
         setAssignments(parsed.assignments || {});
@@ -21,13 +23,13 @@ export default function SavedVideos() {
         setCategories(unique);
       }
     } catch { /* ignore */ }
-  }, []);
+  }, [categoryKey]);
 
   const saveState = (nextAssignments, nextCategories) => {
     setAssignments(nextAssignments);
     setCategories(nextCategories);
     try {
-      localStorage.setItem("nt_saved_categories", JSON.stringify({
+      localStorage.setItem(categoryKey, JSON.stringify({
         assignments: nextAssignments,
         categories: nextCategories.filter((c) => c !== "all"),
       }));
