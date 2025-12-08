@@ -142,9 +142,13 @@ export default function VideoPage({ id }) {
     setNewCategory("");
   }
 
-  async function handleSaveToggle() {
-    setCategoryOpen(true);
-    await toggleSave(video.id);
+  const openSaveBox = () => setCategoryOpen((prev) => !prev);
+
+  async function confirmSave() {
+    if (!video) return;
+    if (!isSaved) {
+      await toggleSave(video.id);
+    }
     if (saveCategory && saveCategory !== "none") {
       const next = { ...assignments, [video.id]: saveCategory };
       const nextCats = categories.includes(saveCategory) ? categories : [...categories, saveCategory];
@@ -154,6 +158,7 @@ export default function VideoPage({ id }) {
       delete next[video.id];
       persistCategories(next, categories);
     }
+    setCategoryOpen(false);
   }
 
   if (!video) {
@@ -232,9 +237,22 @@ export default function VideoPage({ id }) {
         .actions { margin-left:auto; display:flex; gap:10px; }
         .btn { height:36px; padding:0 14px; border:1px solid #e5e7eb; background:#fff; border-radius:999px; font-weight:700; cursor:pointer; }
         .btn.primary { background:#111827; color:#fff; border-color:#111827; }
-        .saveControls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
+        .saveControls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; position:relative; }
         .select { height:32px; border:1px solid #d1d5db; border-radius:10px; padding:0 8px; }
         .smallInput { height:32px; border:1px solid #d1d5db; border-radius:10px; padding:0 8px; }
+        .saveBox {
+          position:absolute;
+          top:44px;
+          left:0;
+          z-index:5;
+          background:#fff;
+          border:1px solid #e5e7eb;
+          border-radius:12px;
+          padding:10px;
+          box-shadow:0 8px 20px rgba(0,0,0,0.08);
+          min-width:280px;
+        }
+        .saveBoxActions { display:flex; gap:8px; margin-top:8px; flex-wrap:wrap; }
 
         .descBox { margin-top:10px; border:1px solid var(--line); background:#fff; border-radius:12px; padding:12px; }
         .descText { color:#111; font-size:14px; line-height:1.45; white-space:pre-wrap; }
@@ -320,25 +338,33 @@ export default function VideoPage({ id }) {
                 {isSubd ? "Subscribed ✓" : "Subscribe"}
               </button>
               <div className="saveControls">
-                <button className={`btn ${isSaved ? "primary" : ""}`} type="button" onClick={handleSaveToggle}>
-                  {isSaved ? "Saved ✓" : "Save"}
-                </button>
-                {categoryOpen && (
-                  <>
-                    <select className="select" value={saveCategory} onChange={(e)=>setSaveCategory(e.target.value)}>
-                      {categories.map((c)=>(
-                        <option key={c} value={c}>{c === "none" ? "No category" : c}</option>
-                      ))}
-                    </select>
-                    <input
-                      className="smallInput"
-                      value={newCategory}
-                      onChange={(e)=>setNewCategory(e.target.value)}
-                      placeholder="New category"
-                    />
-                    <button className="btn" type="button" onClick={addCategory}>Add</button>
-                  </>
-                )}
+                <div className="saveBox">
+                  <button className={`btn ${isSaved ? "primary" : ""}`} type="button" onClick={openSaveBox}>
+                    {isSaved ? "Saved ✓" : "Save"}
+                  </button>
+                  {categoryOpen && (
+                    <div style={{ marginTop:8 }}>
+                      <select className="select" value={saveCategory} onChange={(e)=>setSaveCategory(e.target.value)}>
+                        {categories.map((c)=>(
+                          <option key={c} value={c}>{c === "none" ? "No category" : c}</option>
+                        ))}
+                      </select>
+                      <input
+                        className="smallInput"
+                        value={newCategory}
+                        onChange={(e)=>setNewCategory(e.target.value)}
+                        placeholder="New category"
+                        style={{ marginLeft:6 }}
+                      />
+                      <div className="saveBoxActions">
+                        <button className="btn" type="button" onClick={addCategory}>Add category</button>
+                        <button className="btn" type="button" onClick={confirmSave}>
+                          {isSaved ? "Update" : "Save now"}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
