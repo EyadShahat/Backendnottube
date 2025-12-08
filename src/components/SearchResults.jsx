@@ -8,14 +8,22 @@ export default function SearchResults({ q = "" }) {
 
   React.useEffect(() => { refreshVideos(term); }, [term, refreshVideos]);
 
-  const results = React.useMemo(() => {
+  const { videos: videoResults, channels } = React.useMemo(() => {
     const t = term.trim().toLowerCase();
-    if (!t) return [];
-    return videos.filter(v =>
+    if (!t) return { videos: [], channels: [] };
+    const vids = videos.filter(v =>
       (v.title || "").toLowerCase().includes(t) ||
       (v.channelName || v.channel || "").toLowerCase().includes(t) ||
       (v.description || "").toLowerCase().includes(t)
     );
+    const chans = Array.from(
+      new Map(
+        videos
+          .map((v) => [v.channelName || v.channel, v])
+          .filter(([name]) => name && name.toLowerCase().includes(t))
+      ).values()
+    );
+    return { videos: vids, channels: chans };
   }, [term, videos]);
 
   const goSearch = () => {
@@ -64,12 +72,33 @@ export default function SearchResults({ q = "" }) {
         </div>
       </div>
 
-      {term.trim() && results.length === 0 && (
+      {term.trim() && videoResults.length === 0 && channels.length === 0 && (
         <div className="empty">No results for <strong>{term}</strong>.</div>
       )}
 
+      {channels.length > 0 && (
+        <div className="list">
+          {channels.map((v) => (
+            <a key={v.channelName || v.channel} href={`#/channel/${encodeURIComponent((v.channelName || v.channel || "").replace(/\s+/g, "-").toLowerCase())}`} className="item">
+              <div className="thumb" style={v.thumb ? { backgroundImage:`url(${v.thumb})`, backgroundSize:"cover", backgroundPosition:"center" } : undefined}>
+                {!v.thumb && (
+                  <div style={{ width:"100%", height:"100%", display:"flex", alignItems:"center", justifyContent:"center", color:"#6b7280" }}>
+                    {(v.channelName || v.channel || "Channel").slice(0,1).toUpperCase()}
+                  </div>
+                )}
+              </div>
+              <div className="meta">
+                <div className="ttl">{v.channelName || v.channel || "Channel"}</div>
+                <div className="by">{v.views || 0} views</div>
+                {v.owner?.bio && <div className="desc">{v.owner.bio}</div>}
+              </div>
+            </a>
+          ))}
+        </div>
+      )}
+
       <div className="list">
-        {results.map(v => (
+        {videoResults.map(v => (
           <a key={v.id} href={`#/video/${v.id}`} className="item">
             <div className="thumb">
               {v.thumb ? (
