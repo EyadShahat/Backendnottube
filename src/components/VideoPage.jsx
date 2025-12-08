@@ -29,6 +29,7 @@ export default function VideoPage({ id }) {
   const [newCategory, setNewCategory] = React.useState("");
   const [categories, setCategories] = React.useState(["none"]);
   const [assignments, setAssignments] = React.useState({});
+  const [categoryOpen, setCategoryOpen] = React.useState(false);
   const isAdmin = user?.role === "admin";
 
   React.useEffect(() => {
@@ -142,6 +143,7 @@ export default function VideoPage({ id }) {
   }
 
   async function handleSaveToggle() {
+    setCategoryOpen(true);
     await toggleSave(video.id);
     if (saveCategory && saveCategory !== "none") {
       const next = { ...assignments, [video.id]: saveCategory };
@@ -230,7 +232,7 @@ export default function VideoPage({ id }) {
         .actions { margin-left:auto; display:flex; gap:10px; }
         .btn { height:36px; padding:0 14px; border:1px solid #e5e7eb; background:#fff; border-radius:999px; font-weight:700; cursor:pointer; }
         .btn.primary { background:#111827; color:#fff; border-color:#111827; }
-        .saveControls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+        .saveControls { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:8px; }
         .select { height:32px; border:1px solid #d1d5db; border-radius:10px; padding:0 8px; }
         .smallInput { height:32px; border:1px solid #d1d5db; border-radius:10px; padding:0 8px; }
 
@@ -321,18 +323,22 @@ export default function VideoPage({ id }) {
                 <button className={`btn ${isSaved ? "primary" : ""}`} type="button" onClick={handleSaveToggle}>
                   {isSaved ? "Saved ✓" : "Save"}
                 </button>
-                <select className="select" value={saveCategory} onChange={(e)=>setSaveCategory(e.target.value)}>
-                  {categories.map((c)=>(
-                    <option key={c} value={c}>{c === "none" ? "No category" : c}</option>
-                  ))}
-                </select>
-                <input
-                  className="smallInput"
-                  value={newCategory}
-                  onChange={(e)=>setNewCategory(e.target.value)}
-                  placeholder="New category"
-                />
-                <button className="btn" type="button" onClick={addCategory}>Add</button>
+                {categoryOpen && (
+                  <>
+                    <select className="select" value={saveCategory} onChange={(e)=>setSaveCategory(e.target.value)}>
+                      {categories.map((c)=>(
+                        <option key={c} value={c}>{c === "none" ? "No category" : c}</option>
+                      ))}
+                    </select>
+                    <input
+                      className="smallInput"
+                      value={newCategory}
+                      onChange={(e)=>setNewCategory(e.target.value)}
+                      placeholder="New category"
+                    />
+                    <button className="btn" type="button" onClick={addCategory}>Add</button>
+                  </>
+                )}
               </div>
             </div>
           </div>
