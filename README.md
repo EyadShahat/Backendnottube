@@ -18,16 +18,14 @@ npm run dev            # http://localhost:5173
 ```
 
 ## Environment variables
-`backend/.env` (see `.env.example`):
-- `PORT` (default 4000)
-- `MONGODB_URI` MongoDB connection string
-- `JWT_SECRET` secret key
-- `CLIENT_ORIGIN` comma-separated allowed origins (e.g. `http://localhost:5173,https://your-site.com`)
-- `ADMIN_EMAILS` comma-separated admin emails
-- `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `SUPABASE_BUCKET` for uploads
-
-`nottube/.env` (see `.env.example`):
-- `VITE_API_URL` REST base, include `/api` (e.g. `https://your-api.com/api`). If omitted, dev defaults to `http://localhost:4000/api` and prod falls back to same-origin `/api`.
+PORT=4000
+MONGODB_URI=mongodb+srv://s202349310_db_user:123@cluster0.0ckipef.mongodb.net/?appName=Cluster0
+JWT_SECRET=change-this-secret
+CLIENT_ORIGIN=http://localhost:5173
+ADMIN_EMAILS=admin@nottube.com
+SUPABASE_URL=https://tygbixuonaooyabtiwiq.supabase.co 
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR5Z2JpeHVvbmFvb3lhYnRpd2lxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2NTAzNTg3NywiZXhwIjoyMDgwNjExODc3fQ.VMDphO5_vkY4xMrNZTbLMmGrFfRGae1sPyma3heLNWY
+SUPABASE_BUCKET=videos
 
 ## Scripts
 Backend:
